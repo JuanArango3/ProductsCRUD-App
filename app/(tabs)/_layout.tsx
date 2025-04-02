@@ -1,45 +1,53 @@
-import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Tabs, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/context/AuthContext'; // Ajusta ruta
+import { TouchableOpacity, Alert } from 'react-native';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+    const { isAdmin } = useAuth();
+    const router = useRouter();
 
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
+    // Función para verificar admin y navegar (para botón Añadir)
+    const navigateToAddProduct = () => {
+        if (isAdmin) {
+            router.push({ pathname: "/productEdit", params: { productId: 'null' } });
+        } else {
+            Alert.alert("Acceso denegado", "Necesitas ser administrador para añadir productos.");
+            // Opcional: redirigir a login si se quiere forzar
+            // router.push('/login');
+        }
+    };
+
+    return (
+        <Tabs screenOptions={{ headerShown: true }} >
+            <Tabs.Screen
+                name="index" // app/(tabs)/index.tsx
+                options={{
+                    title: 'Tienda',
+                    tabBarIcon: ({ color, size }) => (<Ionicons name="list" size={size} color={color} />),
+                    headerRight: () => (isAdmin ? ( // Mostrar botón solo si es admin
+                        <TouchableOpacity onPress={navigateToAddProduct} style={{ marginRight: 15 }}>
+                            <Ionicons name="add-circle" size={26} color="#0d6efd" />
+                        </TouchableOpacity>
+                    ) : null), // No mostrar nada si no es admin
+                }}
+            />
+            <Tabs.Screen
+                name="explore" // app/(tabs)/explore.tsx
+                options={{
+                    title: 'Explorar',
+                    tabBarIcon: ({ color, size }) => (<Ionicons name="search" size={size} color={color} />),
+                }}
+            />
+            {/* Nueva Pestaña para Perfil/Login/Logout */}
+            <Tabs.Screen
+                name="profile" // app/(tabs)/profile.tsx
+                options={{
+                    title: 'Cuenta', // O 'Perfil' o 'Login'
+                    tabBarIcon: ({ color, size }) => (<Ionicons name="person-circle-outline" size={size} color={color} />),
+                }}
+            />
+        </Tabs>
+    );
 }

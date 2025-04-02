@@ -96,7 +96,7 @@ export const productService = {
         apiRequest<ProductDTO>('/product', 'POST', productData),
     updateProduct: (productData: ProductDTO): Promise<ProductDTO> =>
         apiRequest<ProductDTO>('/product', 'PUT', productData),
-    deleteProduct: (id: number): Promise<void> => // DELETE no devuelve cuerpo usualmente
+    deleteProduct: (id: number): Promise<void> =>
         apiRequest<void>(`/product/${id}`, 'DELETE'),
 };
 

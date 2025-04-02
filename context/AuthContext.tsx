@@ -1,9 +1,9 @@
 import {ApiError, JwtPayload} from "@/types/api";
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
-import ExpoSecureStore from "expo-secure-store/src/ExpoSecureStore";
+import * as SecureStore from 'expo-secure-store';
 import {checkIsAdmin, parseJwt} from "@/utils/jwtUtils";
 import {authService} from "@/services/api";
-
+import {getItemAsync} from "expo-secure-store";
 
 interface AuthContextType {
     authToken: string | null;
@@ -30,7 +30,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     useEffect(() => {
         const loadToken = async () => {
             try {
-                const storedToken = await ExpoSecureStore.getItemAsync('authToken');
+                const storedToken = await getItemAsync('authToken');
                 if (storedToken) {
                     updateAuthState(storedToken);
                 }
@@ -49,12 +49,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setAuthToken(token);
             setAuthUser(decoded);
             setIsAdmin(checkIsAdmin(token));
-            ExpoSecureStore.setItemAsync('authToken', token);
+            SecureStore.setItemAsync('authToken', token);
         } else {
             setAuthToken(null);
             setAuthUser(null);
             setIsAdmin(false);
-            ExpoSecureStore.deleteItemAsync('authToken');
+            SecureStore.deleteItemAsync('authToken');
         }
     };
 

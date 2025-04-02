@@ -1,74 +1,71 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, FlatList, StyleSheet, ActivityIndicator, Text, Alert, RefreshControl } from 'react-native';
+import ProductCard from '@/components/ProductCard';
+import { productService } from '@/services/api';
+import { useAuth } from '@/context/AuthContext';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { ProductDTO, ApiError } from '@/types/api';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const ProductListScreen = () => {
+    const { isAdmin, logout, authToken } = useAuth(); // Necesitamos authToken para borrado/edición
+    const router = useRouter();
+    const [products, setProducts] = useState<ProductDTO[]>([]);
+    const [page, setPage] = useState<number>(0);
+    const [totalPages, setTotalPages] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
-}
+    const loadProducts = useCallback(async (pageNum: number = 0, isRefreshing: boolean = false) => {
+        if (loading || loadingMore) return;
+        console.log(`Loading products page: ${pageNum}`);
+        setLoading(pageNum === 0 && !isRefreshing);
+        setLoadingMore(pageNum > 0); setError(null);
+        try {
+            const response = await productService.getProducts(pageNum, 10);
+            setProducts(prev => pageNum === 0 ? response.elements : [...prev, ...response.elements]);
+            setPage(response.actualPage); setTotalPages(response.totalPages);
+        } catch (err) {
+            const apiError = err as ApiError; console.error("Error loading products:", apiError);
+            setError('No se pudieron cargar los productos.');
+        } finally {
+            setLoading(false); setLoadingMore(false); setRefreshing(false);
+        }}, []
+    );
+    useFocusEffect(useCallback(() => { loadProducts(0); }, [loadProducts]));
+    const handleLoadMore = () => { if (!loadingMore && page < totalPages - 1) { loadProducts(page + 1); } };
+    const onRefresh = useCallback(() => { setRefreshing(true); loadProducts(0, true); }, [loadProducts]);
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+    const handleEdit = (productId: number) => {
+        if (isAdmin) { // Verificar admin antes de navegar
+            router.push({ pathname: "/productEdit", params: { productId: productId.toString() } });
+        } else {
+            Alert.alert("Acceso denegado", "Necesitas ser administrador para editar productos.");
+            router.push('/login');
+        }
+    };
+
+    const handleDelete = (productId: number) => {
+        if (!isAdmin || !authToken) { // Verificar admin y token
+            Alert.alert("Acceso denegado", "Necesitas ser administrador para eliminar productos.");
+            router.push('/login');
+            return;
+        }
+        Alert.alert( "Confirmar Eliminación", `¿Estás seguro de que quieres eliminar el producto ID ${productId}?`, [ { text: "Cancelar", style: "cancel" }, { text: "Eliminar", style: "destructive", onPress: async () => { try { setLoading(true); await productService.deleteProduct(productId); Alert.alert("Éxito", "Producto eliminado."); loadProducts(0); } catch (err) { const apiError = err as ApiError; console.error("Error deleting product:", apiError); const message = apiError.message || 'No se pudo eliminar el producto.'; Alert.alert("Error", message); if (apiError.status === 401 || apiError.status === 403) { logout(); } } finally { setLoading(false); } } } ] );
+    };
+
+    const renderFooter = () => { if (!loadingMore) return null; return <ActivityIndicator style={{ marginVertical: 20 }} size="large" />; };
+
+    if (loading && products.length === 0) { return <View style={styles.centered}><ActivityIndicator size="large" /></View>; }
+    if (error && products.length === 0) { return <View style={styles.centered}><Text style={styles.errorText}>{error}</Text></View>; }
+
+    return (
+        <View style={styles.container}>
+            <FlatList data={products} renderItem={({ item }: { item: ProductDTO }) => (<ProductCard product={item} isAdmin={isAdmin} onEdit={handleEdit} onDelete={handleDelete} />)} keyExtractor={(item: ProductDTO) => item.id.toString()} contentContainerStyle={styles.listContainer} onEndReached={handleLoadMore} onEndReachedThreshold={0.5} ListFooterComponent={renderFooter} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} ListEmptyComponent={() => ( !loading && !error && <View style={styles.centered}><Text>No hay productos disponibles.</Text></View> )} />
+            {error && products.length > 0 && <Text style={styles.errorTextFooter}>{error}</Text>}
+        </View>
+    );
+};
+const styles = StyleSheet.create({ container: { flex: 1, backgroundColor: '#f8f9fa' }, listContainer: { padding: 10 }, centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }, errorText: { color: 'red', textAlign: 'center' }, errorTextFooter: { color: 'red', textAlign: 'center', padding: 10 } });
+export default ProductListScreen;
