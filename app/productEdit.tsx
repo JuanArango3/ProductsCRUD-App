@@ -68,7 +68,6 @@ const ProductEditScreen = () => {
     if (isFetchingData) { return <View style={inputStyles.container}><ActivityIndicator size="large" /></View>; }
 
     return (
-        // ScrollView y Formulario (sin cambios estructurales)
         <ScrollView style={inputStyles.container}>
             <Text style={inputStyles.label}>Nombre:</Text>
             <TextInput style={inputStyles.input} value={name} onChangeText={setName} placeholder="Nombre del producto" />
@@ -79,8 +78,22 @@ const ProductEditScreen = () => {
             <Text style={inputStyles.label}>Imágenes:</Text>
             <Button title="Seleccionar Imágenes" onPress={pickImage} />
             <View style={inputStyles.imagePreviewArea}>
-                {imageUuids.map(uuid => ( <View key={uuid} style={inputStyles.previewContainer}> <Image source={{ uri: imageService.getImageUrl(uuid) ?? undefined }} style={inputStyles.previewImage} /> <TouchableOpacity onPress={() => removeUploadedImage(uuid)} style={inputStyles.removeButton}><Ionicons name="close-circle" size={18} color="white" /></TouchableOpacity> </View> ))}
-                {localImageUris.map(uri => ( <View key={uri} style={inputStyles.previewContainer}> <Image source={{ uri: uri }} style={inputStyles.previewImage} /> <TouchableOpacity onPress={() => removeLocalImage(uri)} style={inputStyles.removeButton}><Ionicons name="close-circle" size={18} color="white" /></TouchableOpacity> </View> ))}
+                {imageUuids.map(uuid => (
+                    <View key={uuid} style={inputStyles.previewContainer}>
+                        <Image source={{ uri: imageService.getImageUrl(uuid) ?? undefined }} style={inputStyles.previewImage} />
+                        <TouchableOpacity onPress={() => removeUploadedImage(uuid)} style={inputStyles.removeButton}>
+                            <Ionicons name="close-circle" size={18} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                ))}
+                {localImageUris.map(uri => (
+                    <View key={uri} style={inputStyles.previewContainer}>
+                        <Image source={{ uri: uri }} style={inputStyles.previewImage} />
+                        <TouchableOpacity onPress={() => removeLocalImage(uri)} style={inputStyles.removeButton}>
+                            <Ionicons name="close-circle" size={18} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                ))}
                 {imageUuids.length === 0 && localImageUris.length === 0 && (<Text style={{ color: '#6c757d', fontSize: 12 }}>Ninguna imagen seleccionada.</Text>)}
             </View>
             {localImageUris.length > 0 && (<Text style={{ color: 'orange', fontSize: 12, marginBottom: 10 }}>Tienes {localImageUris.length} imágen(es) pendiente(s) de subir. Se subirán al guardar.</Text>)}

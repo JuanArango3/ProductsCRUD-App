@@ -62,7 +62,17 @@ const ProductListScreen = () => {
 
     return (
         <View style={styles.container}>
-            <FlatList data={products} renderItem={({ item }: { item: ProductDTO }) => (<ProductCard product={item} isAdmin={isAdmin} onEdit={handleEdit} onDelete={handleDelete} />)} keyExtractor={(item: ProductDTO) => item.id.toString()} contentContainerStyle={styles.listContainer} onEndReached={handleLoadMore} onEndReachedThreshold={0.5} ListFooterComponent={renderFooter} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} ListEmptyComponent={() => ( !loading && !error && <View style={styles.centered}><Text>No hay productos disponibles.</Text></View> )} />
+            <FlatList data={products}
+                      renderItem={({ item }: { item: ProductDTO }) =>
+                          (<ProductCard product={item} isAdmin={isAdmin} onEdit={handleEdit} onDelete={handleDelete} />)
+                      }
+                      keyExtractor={(item: ProductDTO) => item.id.toString()}
+                      contentContainerStyle={styles.listContainer}
+                      onEndReached={handleLoadMore}
+                      onEndReachedThreshold={0.5}
+                      ListFooterComponent={renderFooter}
+                      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+                      ListEmptyComponent={() => ( !loading && !error && <View style={styles.centered}><Text>No hay productos disponibles.</Text></View> )} />
             {error && products.length > 0 && <Text style={styles.errorTextFooter}>{error}</Text>}
         </View>
     );
