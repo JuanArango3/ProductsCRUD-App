@@ -14,8 +14,7 @@ export default function TabLayout() {
             router.push({ pathname: "/productEdit", params: { productId: 'null' } });
         } else {
             Alert.alert("Acceso denegado", "Necesitas ser administrador para añadir productos.");
-            // Opcional: redirigir a login si se quiere forzar
-            // router.push('/login');
+            router.push('/login');
         }
     };
 
@@ -33,14 +32,6 @@ export default function TabLayout() {
                     ) : null), // No mostrar nada si no es admin
                 }}
             />
-            <Tabs.Screen
-                name="explore" // app/(tabs)/explore.tsx
-                options={{
-                    title: 'Explorar',
-                    tabBarIcon: ({ color, size }) => (<Ionicons name="search" size={size} color={color} />),
-                }}
-            />
-            {/* Nueva Pestaña para Perfil/Login/Logout */}
             <Tabs.Screen
                 name="profile" // app/(tabs)/profile.tsx
                 options={{

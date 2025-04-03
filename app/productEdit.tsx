@@ -11,11 +11,10 @@ import { Ionicons } from '@expo/vector-icons';
 const inputStyles = StyleSheet.create({ container: { flex: 1, padding: 20 }, label: { fontSize: 16, marginBottom: 5, fontWeight: 'bold' }, input: { height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 15, paddingHorizontal: 10, borderRadius: 5, backgroundColor: 'white' }, textArea: { height: 100, textAlignVertical: 'top', borderColor: 'gray', borderWidth: 1, marginBottom: 15, paddingHorizontal: 10, borderRadius: 5, backgroundColor: 'white' }, imagePreviewArea: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 10, marginBottom: 15, paddingVertical: 10, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#ccc' }, previewContainer: { position: 'relative', width: 80, height: 80 * 9 / 16, borderWidth: 1, borderColor: '#eee', borderRadius: 4, overflow: 'hidden', backgroundColor: '#eee' }, previewImage: { width: '100%', height: '100%' }, removeButton: { position: 'absolute', top: 2, right: 2, backgroundColor: 'rgba(220, 53, 69, 0.8)', borderRadius: 10, padding: 2 }, errorText: { color: 'red', marginBottom: 10, textAlign: 'center' },});
 
 const ProductEditScreen = () => {
-    // Obtener parámetros con useLocalSearchParams (devuelve strings)
     const params = useLocalSearchParams<{ productId?: string }>();
     const productId = params.productId && params.productId !== 'null' ? parseInt(params.productId, 10) : null; // Convertir a número o null
     const router = useRouter();
-    const { authToken, logout } = useAuth();
+    const { logout } = useAuth();
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [price, setPrice] = useState<string>('');
@@ -24,11 +23,6 @@ const ProductEditScreen = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [isFetchingData, setIsFetchingData] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-
-    // Configurar título dinámicamente en el layout (opcional, si no se hizo en _layout)
-    // useEffect(() => {
-    //     navigation.setOptions({ title: productId ? 'Editar Producto' : 'Nuevo Producto' });
-    // }, [productId, navigation]);
 
     useEffect(() => {
         if (productId) {
