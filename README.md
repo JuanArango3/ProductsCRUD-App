@@ -1,50 +1,79 @@
-# Welcome to your Expo app 👋
+# Aplicación Móvil ProductsCRUD (React Native)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Este repositorio contiene el código fuente del cliente móvil para la API ProductsCRUD. La aplicación está desarrollada utilizando React Native y Expo (con Expo Router).
 
-## Get started
+Permite visualizar productos y, para usuarios administradores, realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre ellos, incluyendo la gestión de imágenes.
 
-1. Install dependencies
+## Prerrequisitos
 
-   ```bash
-   npm install
-   ```
+Para poder ejecutar o construir esta aplicación localmente, necesitarás tener instalado el siguiente software:
 
-2. Start the app
+1.  **Node.js:** Se recomienda la versión LTS. Puedes descargarlo desde [nodejs.org](https://nodejs.org/).
+2.  **Gestor de Paquetes:** Necesitarás `npm` (que viene con Node.js), `yarn` o `pnpm`. Este proyecto utiliza `pnpm` internamente (como se ve en `pnpm-lock.yaml`), por lo que se recomienda usarlo para instalar dependencias (`npm install -g pnpm`).
+3.  **Entorno de Desarrollo Android:**
+   * **Android Studio:** Incluye el Android SDK y herramientas para crear emuladores. Descarga desde [Android Studio](https://developer.android.com/studio).
+   * **Android SDK:** Asegúrate de tener un SDK de Android instalado (generalmente gestionado a través de Android Studio).
+   * **Dispositivo/Emulador:** Necesitas un dispositivo Android físico conectado con la depuración USB habilitada, o un Emulador Android configurado y ejecutándose a través de Android Studio. Tu dispositivo/emulador debe ser reconocido por ADB (puedes verificarlo ejecutando `adb devices` en tu terminal).
+   * Sigue la guía de configuración del entorno de Expo/React Native para tu sistema operativo: [React Native Environment Setup](https://reactnative.dev/docs/environment-setup) (selecciona "Expo Go Quickstart").
 
-   ```bash
-    npx expo start
-   ```
+## Configuración
 
-In the output, you'll find options to open the app in a
+### URL del Backend API
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Por defecto, la aplicación apunta a la API desplegada en `https://productscrud.jmarango.me/api`.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Si deseas apuntar a una instancia diferente del backend (por ejemplo, una ejecutándose localmente o en otro servidor):
 
-## Get a fresh project
+1.  Edita el archivo: `constants/Backend.ts`
+2.  Modifica el valor de la constante `API_BASE_URL`:
 
-When you're ready, run:
+    ```typescript
+    // constants/Backend.ts
+    export const API_BASE_URL = 'URL_DE_TU_API';
+    // Ejemplo local Android (si backend corre en puerto 8080):
+    // export const API_BASE_URL = 'http://127.0.0.1:8080/api';
+    ```
 
-```bash
-npm run reset-project
-```
+## Ejecutar en Desarrollo
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Sigue estos pasos para ejecutar la aplicación en un emulador o dispositivo físico conectado para desarrollo y pruebas:
 
-## Learn more
+1.  **Clona el Repositorio:**
+    ```bash
+    git clone https://github.com/JuanArango3/ProductsCRUD-App.git
+    cd ProductsCRUD-App
+    ```
+2.  **Instala las Dependencias:**
+    ```bash
+    pnpm install
+    ```
+    (Si prefieres npm o yarn: `npm install` o `yarn install`)
 
-To learn more about developing your project with Expo, look at the following resources:
+3.  **Prepara tu Dispositivo/Emulador:** Asegúrate de que esté ejecutándose y sea reconocido por `adb devices`.
+4.  **Ejecuta la Aplicación:**
+    ```bash
+    pnpm exec expo run:android
+    ```
+    (O usa `npx expo run:android` / `yarn expo run:android`)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+    Expo (a través de React Native CLI) compilará e instalará la aplicación en tu dispositivo/emulador. La primera vez puede tardar un poco más. Podrás ver la aplicación y los logs en la terminal.
 
-## Join the community
+## Instalar APK (Alternativa)
 
-Join our community of developers creating universal apps.
+Si no deseas construir la aplicación desde el código fuente, puedes instalar un archivo `.apk` pre-compilado:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1.  Ve a la sección de **"Releases"** de este repositorio en GitHub.
+2.  Descarga el último archivo `.apk` disponible.
+3.  Transfiere el archivo `.apk` a tu dispositivo Android.
+4.  En tu dispositivo Android, busca el archivo `.apk` usando un explorador de archivos.
+5.  Tócalo para instalarlo. Es posible que necesites habilitar la instalación desde "Fuentes desconocidas" en la configuración de seguridad de tu Android.
+
+## Tecnologías Utilizadas
+
+* React Native
+* Expo (SDK, Expo Router, Expo SecureStore, Expo ImagePicker)
+* TypeScript
+* Expo Router (para navegación basada en archivos)
+* React Context API (para gestión de estado de autenticación)
+* Fetch API (para comunicación con el backend)
+* PNPM (como gestor de paquetes en este ejemplo)
