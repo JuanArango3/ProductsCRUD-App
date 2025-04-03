@@ -9,10 +9,10 @@ Permite visualizar productos y, para usuarios administradores, realizar operacio
 Para poder ejecutar o construir esta aplicación localmente, necesitarás tener instalado el siguiente software:
 
 1.  **Node.js:** Se recomienda la versión LTS. Puedes descargarlo desde [nodejs.org](https://nodejs.org/).
-2.  **Gestor de Paquetes:** Necesitarás `npm` (que viene con Node.js), `yarn` o `pnpm`. Este proyecto utiliza `pnpm` internamente (como se ve en `pnpm-lock.yaml`), por lo que se recomienda usarlo para instalar dependencias (`npm install -g pnpm`).
+2.  **Gestor de Paquetes:** Necesitarás `npm` (que viene con Node.js), `yarn` o `pnpm`. Este proyecto utiliza `pnpm` internamente (como se ve en `pnpm-lock.yaml`).
 3.  **Entorno de Desarrollo Android:**
    * **Android Studio:** Incluye el Android SDK y herramientas para crear emuladores. Descarga desde [Android Studio](https://developer.android.com/studio).
-   * **Android SDK:** Asegúrate de tener un SDK de Android instalado (generalmente gestionado a través de Android Studio).
+   * **Android SDK:** Asegúrate de tener un SDK de Android instalado.
    * **Dispositivo/Emulador:** Necesitas un dispositivo Android físico conectado con la depuración USB habilitada, o un Emulador Android configurado y ejecutándose a través de Android Studio. Tu dispositivo/emulador debe ser reconocido por ADB (puedes verificarlo ejecutando `adb devices` en tu terminal).
    * Sigue la guía de configuración del entorno de Expo/React Native para tu sistema operativo: [React Native Environment Setup](https://reactnative.dev/docs/environment-setup) (selecciona "Expo Go Quickstart").
 
